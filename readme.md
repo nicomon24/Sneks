@@ -1,6 +1,5 @@
-# Slither1n openAI gym environment
-Slither1n is an openAI gym environment similar to the classic game Snake.
-It is the base for constructing the multi-agent version Slitherin
+# Sneks openAI gym environment
+Sneks is an openAI gym environment similar to the classic game Snake. It contains both a single-player version (Snek) and a multi-player version(Sneks)
 
 ## Installation
 The environment can be installed using pip

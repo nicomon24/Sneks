@@ -3,12 +3,12 @@
 '''
 
 import gym
-import slither1n
+import sneks
 from time import sleep
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--env', type=str, default='slither1n',
+parser.add_argument('--env', type=str, default='snek-v1',
   help="""\
   Blablabla
 """)
@@ -22,3 +22,4 @@ while not done:
     action = env.action_space.sample()
     obs, reward, done, info = env.step(action)
     env.render()
+    sleep(1)

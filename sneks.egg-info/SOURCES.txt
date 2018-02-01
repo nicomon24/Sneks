@@ -1,0 +1,6 @@
+sneks/__init__.py
+sneks.egg-info/PKG-INFO
+sneks.egg-info/SOURCES.txt
+sneks.egg-info/dependency_links.txt
+sneks.egg-info/requires.txt
+sneks.egg-info/top_level.txt

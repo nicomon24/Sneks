@@ -10,12 +10,12 @@ class Renderer:
 
     def __init__(self, size, zoom_factor=1, object_colors={}):
         self.COLORS = {
-            # Ground
-            0: (0, 255, 0),
-            # Wall
-            1: (0,0,0),
-            # Goal
-            999: (255,0,0)
+            # Void
+            0: (0,0,0),
+            # Player
+            100: (0, 255, 0),
+            # Food
+            1: (255, 0, 0)
         }
         for key, value in object_colors.items():
             self.COLORS[key] = value
