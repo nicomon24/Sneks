@@ -35,11 +35,11 @@ class SingleSnek(gym.Env):
         self.renderer = Renderer(self.size, zoom_factor = 10, object_colors={})
 
     def _step(self, action):
-        print("MOVIIIING")
-        return self.world.get_observation(), 0, False, {}
+        return self.world.move_snek(action)
 
     def _reset(self):
         self.current_step = 0
+        self.world.reset()
         return self.world.get_observation()
 
     def _seed(self, seed):
