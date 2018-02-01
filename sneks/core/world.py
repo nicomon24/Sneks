@@ -24,6 +24,7 @@ class World:
     def get_observation(self):
         obs = self.world.copy()
         # Draw snake over the world
+        
         #for snek in snakes:
 
         return obs
