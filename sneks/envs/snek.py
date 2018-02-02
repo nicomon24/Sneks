@@ -24,25 +24,28 @@ class SingleSnek(gym.Env):
     def __init__(self):
         self.CHANNELS = 3
         # Set size of the game world
-        self.size = (32, 32)
+        self.SIZE = (32, 32)
         # Set step limit
-        self.step_limit = 200
+        self.STEP_LIMIT = 200
         # Create world
-        self.world = World(self.size)
+        self.world = World(self.SIZE, n_sneks=1)
         # Set observation and action spaces
-        self.observation_space = spaces.Box(low=0, high=255, shape=(self.size[0], self.size[1], self.CHANNELS))
+        self.observation_space = spaces.Box(low=0, high=255, shape=(self.SIZE[0], self.SIZE[1], self.CHANNELS))
         self.action_space = spaces.Discrete(3)
         # Set renderer
-        self.renderer = Renderer(self.size, zoom_factor = 10, object_colors={})
+        self.renderer = Renderer(self.SIZE, zoom_factor = 10, object_colors={})
 
     def _step(self, action):
-        return self.world.move_snek(action)
+        self.current_step += 1
+        if self.current_step >= self.STEP_LIMIT:
+            return self.world.get_observation(), 0, True, {}
+        rewards, dones = self.world.move_snek([action])
+        return self.world.get_observation(), rewards[0], dones[0], {}
 
     def _reset(self):
         self.current_step = 0
         # Create world
-        self.world = World(self.size)
-        self.world.reset()
+        self.world = World(self.SIZE, n_sneks=1)
         return self.world.get_observation()
 
     def _seed(self, seed):

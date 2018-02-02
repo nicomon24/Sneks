@@ -1,5 +1,5 @@
 '''
-    Rendering object of multigridworld. Receives a map from gridworld and
+    Rendering object of Sneks. Receives a map from gridworld and
     transform it into a visible image (applies colors and zoom)
 '''
 
@@ -15,7 +15,6 @@ class Renderer:
             # Player
             100: (0, 255, 0),
             101: (0, 0, 255),
-            102: (0, 255, 0),
             # Food
             1: (255, 0, 0)
         }
@@ -27,9 +26,17 @@ class Renderer:
         self.width = size[1]
         self.viewer = None
 
+    def get_color(self, state):
+        if state < 100:
+            return self.COLORS[state]
+        elif state % 2 == 0:
+            return self.COLORS[100]
+        else:
+            return self.COLORS[101]
+
     def _get_image(self, state):
         # Transform to RGB image with 3 channels
-        color_lu = np.vectorize(lambda x: self.COLORS[x], otypes=[np.uint8, np.uint8, np.uint8])
+        color_lu = np.vectorize(lambda x: self.get_color(x), otypes=[np.uint8, np.uint8, np.uint8])
         _img = np.array(color_lu(state))
         # Zoom every channel
         _img_zoomed = np.zeros((3, self.height * self.zoom_factor, self.width * self.zoom_factor), dtype=np.uint8)

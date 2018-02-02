@@ -7,3 +7,9 @@ Sneks is an openAI gym environment similar to the classic game Snake. It contain
 The environment can be installed using pip
 
 > pip install -e .
+
+## Requirements
+These environments require numpy and openAI gym.
+
+## Supported platforms
+We only support Python3. Environments are actively tested on Ubuntu and MACOS. Currently there are some issues with Ubuntu renderer.
