@@ -10,6 +10,7 @@ import gym
 from gym import error, spaces, utils
 from gym.utils import seeding
 import numpy as np
+import random
 
 from sneks.core.world import World
 from sneks.core.render import Renderer
@@ -23,7 +24,7 @@ class SingleSnek(gym.Env):
     def __init__(self):
         self.CHANNELS = 3
         # Set size of the game world
-        self.size = (32, 64)
+        self.size = (32, 32)
         # Set step limit
         self.step_limit = 200
         # Create world
@@ -39,11 +40,13 @@ class SingleSnek(gym.Env):
 
     def _reset(self):
         self.current_step = 0
+        # Create world
+        self.world = World(self.size)
         self.world.reset()
         return self.world.get_observation()
 
     def _seed(self, seed):
-        np.random.seed(seed)
+        random.seed(seed)
 
     def _get_state(self):
         return self.world.get_observation()

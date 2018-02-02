@@ -25,7 +25,7 @@ class Snek:
         # Select the start direction
         if start_direction_index is None:
             # Select random direction ()
-            self.current_direction_index = np.random.randint(4)
+            self.current_direction_index = random.randrange(len(self.DIRECTIONS))
         else:
             self.current_direction_index = start_direction_index
         start_position = start_position
@@ -54,17 +54,24 @@ class World:
     def __init__(self, size):
         self.DEAD_REWARD = -100
         self.MOVE_REWARD = -1
-        self.EAT_REWARD = 1
+        self.EAT_REWARD = 100
         self.FOOD = 1
         # Init a numpy matrix with zeros of predefined size
         self.size = size
         self.world = np.zeros(size)
         # All position list
         self.all_positions = set([(i,j) for i in range(self.size[0]) for j in range(self.size[1])])
-        # Init snakes
-        self.sneks = [Snek((16,16))]
+        # Init sneks
+        self.sneks = []
+        n_sneks = 1
+        for i in range(n_sneks):
+            # Choose position (between [4 and SIZE-4])
+            SNEK_SIZE = 4
+            p = (random.randint(SNEK_SIZE, self.size[0]-SNEK_SIZE), random.randint(SNEK_SIZE, self.size[1]-SNEK_SIZE))
+            # Create snek and append
+            self.sneks.append(Snek(p))
 
-    def reset(self, n_food=50):
+    def reset(self, n_food=1):
         self.world = np.zeros(self.size)
         # Set N foods
         for i in range(n_food):
@@ -86,6 +93,7 @@ class World:
             for block in snek.my_blocks:
                 obs[block[0], block[1]] = snek.id
             obs[snek.my_blocks[0][0], snek.my_blocks[0][1]] = snek.id + 1
+            obs[snek.my_blocks[1][0], snek.my_blocks[1][1]] = snek.id + 2
         return obs
 
     def move_snek(self, a):
@@ -108,5 +116,5 @@ class World:
             self.place_one_food()
             reward = self.EAT_REWARD
             # Return
-            return self.get_observation(), self.EAT_REWARD, False, {}
+            return self.get_observation(), self.EAT_REWARD, True, {}
         return self.get_observation(), self.MOVE_REWARD, False, {}
