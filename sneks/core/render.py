@@ -49,8 +49,16 @@ class Renderer:
                 self.viewer = None
             return
         img = self._get_image(state)
-        if mode == 'human':
+        if mode == 'rgb_array':
+            return img
+        elif mode == 'human':
             from gym.envs.classic_control import rendering
             if self.viewer is None:
                 self.viewer = rendering.SimpleImageViewer()
             self.viewer.imshow(img)
+            return self.viewer.isopen
+
+    def close(self):
+        if self.viewer is not None:
+            self.viewer.close()
+            self.viewer = None
