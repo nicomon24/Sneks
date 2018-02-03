@@ -26,10 +26,11 @@ In multi-agent environments actions are provided as vectors. The step function r
 ## Environments and versions
 
 ### BabySnek-v1
-![babysnek][babysnek]
-[babysnek]: src/babysnek.gif?raw=true
+![babysnek][babysnek] <br>
 First simple enviroment, only one snake and one goal (food). The episode terminates once the snake eats the food or dies (eats himself or go outside map limits). <br>
 Rewards:
 - Reach goal (eats): +1
 - Move: 0
 - Dies: -1
+
+[babysnek]: src/babysnek.gif?raw=true
