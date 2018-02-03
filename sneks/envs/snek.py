@@ -18,7 +18,7 @@ from sneks.core.render import Renderer
 class SingleSnek(gym.Env):
 
     metadata = {
-        'render.modes': ['human']
+        'render.modes': ['human','rgb_array']
     }
 
     def __init__(self):
@@ -26,7 +26,7 @@ class SingleSnek(gym.Env):
         # Set size of the game world
         self.SIZE = (32, 32)
         # Set step limit
-        self.STEP_LIMIT = 200
+        self.STEP_LIMIT = 1000
         # Create world
         self.world = World(self.SIZE, n_sneks=1)
         # Set observation and action spaces
@@ -38,7 +38,7 @@ class SingleSnek(gym.Env):
     def _step(self, action):
         self.current_step += 1
         if self.current_step >= self.STEP_LIMIT:
-            return self.world.get_observation(), 0, True, {}
+            return self.world.get_observation(), -1, True, {}
         rewards, dones = self.world.move_snek([action])
         return self.world.get_observation(), rewards[0], dones[0], {}
 
@@ -55,4 +55,16 @@ class SingleSnek(gym.Env):
         return self.world.get_observation()
 
     def _render(self, mode='human', close=False):
-        self.renderer._render(self._get_state(), mode='human', close=False)
+        return self.renderer._render(self._get_state(), mode=mode, close=False)
+
+class SingleBabySnek(SingleSnek):
+
+    def _step(self, action):
+        self.current_step += 1
+        if self.current_step >= self.STEP_LIMIT:
+            return self.world.get_observation(), -1, True, {}
+        rewards, dones = self.world.move_snek([action])
+        if rewards[0] > 0:
+            print("Cibo")
+            return self.world.get_observation(), rewards[0], True, {}
+        return self.world.get_observation(), rewards[0], dones[0], {}

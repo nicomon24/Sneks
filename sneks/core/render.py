@@ -16,7 +16,7 @@ class Renderer:
             100: (0, 255, 0),
             101: (0, 0, 255),
             # Food
-            1: (255, 0, 0)
+            255: (255, 0, 0)
         }
         for key, value in object_colors.items():
             self.COLORS[key] = value
@@ -27,7 +27,7 @@ class Renderer:
         self.viewer = None
 
     def get_color(self, state):
-        if state < 100:
+        if state < 100 or state > 200:
             return self.COLORS[state]
         elif state % 2 == 0:
             return self.COLORS[100]

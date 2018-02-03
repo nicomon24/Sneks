@@ -50,10 +50,10 @@ class Snek:
 class World:
 
     def __init__(self, size, n_sneks=1, n_food=1):
-        self.DEAD_REWARD = -100
-        self.MOVE_REWARD = -1
-        self.EAT_REWARD = 100
-        self.FOOD = 1
+        self.DEAD_REWARD = -1
+        self.MOVE_REWARD = 0
+        self.EAT_REWARD = 1
+        self.FOOD = 255
         # Init a numpy matrix with zeros of predefined size
         self.size = size
         self.world = np.zeros(size)
