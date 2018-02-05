@@ -15,12 +15,12 @@ class Snek:
         3: LEFT (West)
 
         ACTIONS:
-        0: NOOP
+        0: UP
         1: RIGHT
-        2: LEFT
+        2: DOWN
+        3: LEFT
     '''
     DIRECTIONS = [np.array([-1,0]), np.array([0,1]), np.array([1,0]), np.array([0,-1])]
-    ACTIONS = [0,1,2]
 
     def __init__(self, snek_id, start_position, start_direction_index, start_length):
         self.snek_id = snek_id
@@ -35,9 +35,9 @@ class Snek:
             self.my_blocks.append(tuple(current_positon))
 
     def step(self, action):
-        # Get dAction
-        dAction = ((action +1) % len(self.ACTIONS)) - 1
-        self.current_direction_index = (self.current_direction_index + dAction) % len(self.DIRECTIONS)
+        # Check if action can be performed (do nothing if in the same direction or opposite)
+        if (action != self.current_direction_index) and (action != (self.current_direction_index+2)%len(self.DIRECTIONS)):
+            self.current_direction_index = action
         # Remove tail
         tail = self.my_blocks[-1]
         self.my_blocks = self.my_blocks[:-1]
@@ -50,10 +50,11 @@ class Snek:
 class World:
 
     def __init__(self, size, n_sneks=1, n_food=1):
-        self.DEAD_REWARD = -1
+        self.DEAD_REWARD = 0
         self.MOVE_REWARD = 0
         self.EAT_REWARD = 1
         self.FOOD = 255
+        self.DIRECTIONS = Snek.DIRECTIONS
         # Init a numpy matrix with zeros of predefined size
         self.size = size
         self.world = np.zeros(size)

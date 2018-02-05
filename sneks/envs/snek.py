@@ -24,21 +24,21 @@ class SingleSnek(gym.Env):
     def __init__(self):
         self.CHANNELS = 3
         # Set size of the game world
-        self.SIZE = (32, 32)
+        self.SIZE = (16, 16)
         # Set step limit
         self.STEP_LIMIT = 1000
         # Create world
         self.world = World(self.SIZE, n_sneks=1)
         # Set observation and action spaces
         self.observation_space = spaces.Box(low=0, high=255, shape=(self.SIZE[0], self.SIZE[1], self.CHANNELS))
-        self.action_space = spaces.Discrete(3)
+        self.action_space = spaces.Discrete(len(self.world.DIRECTIONS))
         # Set renderer
-        self.renderer = Renderer(self.SIZE, zoom_factor = 10, object_colors={})
+        self.renderer = Renderer(self.SIZE, zoom_factor = 20, object_colors={})
 
     def _step(self, action):
         self.current_step += 1
         if self.current_step >= self.STEP_LIMIT:
-            return self.world.get_observation(), -1, True, {}
+            return self.world.get_observation(), 0, True, {}
         rewards, dones = self.world.move_snek([action])
         return self.world.get_observation(), rewards[0], dones[0], {}
 
@@ -62,9 +62,8 @@ class SingleBabySnek(SingleSnek):
     def _step(self, action):
         self.current_step += 1
         if self.current_step >= self.STEP_LIMIT:
-            return self.world.get_observation(), -1, True, {}
+            return self.world.get_observation(), 0, True, {}
         rewards, dones = self.world.move_snek([action])
         if rewards[0] > 0:
-            print("Cibo")
-            return self.world.get_observation(), rewards[0], True, {}
+            return self.world.get_observation(), 1, True, {}
         return self.world.get_observation(), rewards[0], dones[0], {}

@@ -27,7 +27,6 @@ while not done:
         r += reward
         env.render()
         sleep(0.01)
-        action = 0
         if done:
             r = 0
             obs = env.reset()
