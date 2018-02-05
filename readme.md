@@ -49,4 +49,3 @@ Below a GIF of the environment played by vanilla DQN. All the solutions and impl
 - Define various multiagent environments:
   - Snakes can eat each other
   - Eat or starve, snakes cannot eat each other but food is limited
-  -
