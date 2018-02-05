@@ -40,12 +40,17 @@ Rewards:
 - Move: 0
 - Dies: -1
 <br>
-Below a GIF of the environment played by vanilla DQN. All the solutions and implementations on the environment can be found in the corresponding [github repo](https://github.com/nicomon24/Sneks-solutions), that contains more detailed explanation on solutions
+Above a GIF of the environment played by vanilla DQN. All the solutions and implementations on the environment can be found in the corresponding [github repo](https://github.com/nicomon24/Sneks-solutions), that contains more detailed explanation on solutions
 
 [snek]: src/snek.gif?raw=true
 
 ## TODO
+- Making the environment more configurable (size, number of food)
 - Larger single-agent environment (32x32 and 64x64)
 - Define various multiagent environments:
   - Snakes can eat each other
   - Eat or starve, snakes cannot eat each other but food is limited
+
+## Ideas
+- Cooperation game: snakes can eat only if they reach the same food together
+- More walls? (Maze-like?) Other block types with different behaviour?
