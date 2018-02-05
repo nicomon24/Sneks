@@ -51,6 +51,6 @@ Above a GIF of the environment played by vanilla DQN. All the solutions and impl
   - Snakes can eat each other
   - Eat or starve, snakes cannot eat each other but food is limited
 
-## Ideas
+## Ideas
 - Cooperation game: snakes can eat only if they reach the same food together
 - More walls? (Maze-like?) Other block types with different behaviour?
