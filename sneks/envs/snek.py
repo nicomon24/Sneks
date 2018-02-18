@@ -22,7 +22,6 @@ class SingleSnek(gym.Env):
     }
 
     def __init__(self):
-        self.CHANNELS = 3
         # Set size of the game world
         self.SIZE = (16, 16)
         # Set step limit
@@ -30,7 +29,7 @@ class SingleSnek(gym.Env):
         # Create world
         self.world = World(self.SIZE, n_sneks=1)
         # Set observation and action spaces
-        self.observation_space = spaces.Box(low=0, high=255, shape=(self.SIZE[0], self.SIZE[1], self.CHANNELS))
+        self.observation_space = spaces.Box(low=0, high=255, shape=(self.SIZE[0], self.SIZE[1]))
         self.action_space = spaces.Discrete(len(self.world.DIRECTIONS))
         # Set renderer
         self.renderer = Renderer(self.SIZE, zoom_factor = 20, object_colors={})
