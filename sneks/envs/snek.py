@@ -61,7 +61,7 @@ class SingleSnek(gym.Env):
         self.current_step = 0
         # Create world
         self.world = World(self.SIZE, n_sneks=1)
-        return self.world.get_observation()
+        return self._get_state()
 
     def _seed(self, seed):
         random.seed(seed)
