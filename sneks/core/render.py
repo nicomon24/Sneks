@@ -6,35 +6,50 @@
 import gym
 import numpy as np
 
-class Renderer:
+class SnekColor:
 
-    def __init__(self, size, zoom_factor=1, object_colors={}):
-        self.COLORS = {
-            # Void
-            0: (0,0,0),
-            # Player
-            100: (0, 255, 0),
-            101: (0, 0, 255),
-            # Food
-            255: (255, 0, 0)
+    def __init__(self, body_color, head_color):
+        self.body_color = body_color
+        self.head_color = head_color
+
+'''
+    This class translates the world state with block ids into an RGB image, with
+    a selected zoom factor. This can be used to return an RGB observation or
+    to render the world.
+'''
+class RGBifier:
+
+    def __init__(self, size, zoom_factor=1, players_colors = {}):
+        # Setting default colors
+        self.pcolors = {
+            0: SnekColor((0, 204, 0), (0, 77, 0))
         }
-        for key, value in object_colors.items():
-            self.COLORS[key] = value
         self.zoom_factor = zoom_factor
         self.size = size
         self.height = size[0]
         self.width = size[1]
-        self.viewer = None
 
     def get_color(self, state):
-        if state < 100 or state > 200:
-            return self.COLORS[state]
-        elif state % 2 == 0:
-            return self.COLORS[100]
+        # Void => BLACK
+        if state == 0:
+            return (0,0,0)
+        # Food => RED
+        elif state == 255:
+            return (255, 0, 0)
         else:
-            return self.COLORS[101]
+            # Get player ID
+            pid = (state - 100) // 2
+            is_head = (state - 100) % 2
+            # Checking that default color exists
+            if pid not in self.pcolors.keys():
+                pid = 0
+            # Assign color (default or given)
+            if is_head == 0:
+                return self.pcolors[pid].body_color
+            else:
+                return self.pcolors[pid].head_color
 
-    def _get_image(self, state):
+    def get_image(self, state):
         # Transform to RGB image with 3 channels
         color_lu = np.vectorize(lambda x: self.get_color(x), otypes=[np.uint8, np.uint8, np.uint8])
         _img = np.array(color_lu(state))
@@ -49,13 +64,22 @@ class Renderer:
         _img_zoomed = np.transpose(_img_zoomed, [1,2,0])
         return _img_zoomed
 
+'''
+    This class specifically handles the renderer for the environment.
+'''
+class Renderer:
+
+    def __init__(self, size, zoom_factor=1, players_colors={}):
+        self.rgb = RGBifier(size, zoom_factor, players_colors)
+        self.viewer = None
+
     def _render(self, state, mode='human', close=False):
         if close:
             if self.viewer is not None:
                 self.viewer.close()
                 self.viewer = None
             return
-        img = self._get_image(state)
+        img = self.rgb.get_image(state)
         if mode == 'rgb_array':
             return img
         elif mode == 'human':

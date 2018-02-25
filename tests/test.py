@@ -8,7 +8,7 @@ from time import sleep
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--env', type=str, default='babysnek-v1',
+parser.add_argument('--env', type=str, default='snek-rgb-v1',
   help="""\
   Blablabla
 """)
