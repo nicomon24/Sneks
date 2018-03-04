@@ -51,14 +51,22 @@ class SingleSnek(gym.Env):
         self.renderer = Renderer(self.SIZE, zoom_factor = 20, players_colors={})
 
     def _step(self, action):
+        # Check if game is ended (raise exception otherwise)
+        if not self.alive:
+            raise Exception('Need to reset env now.')
+        # Check current step
         self.current_step += 1
         if self.current_step >= self.STEP_LIMIT:
+            self.alive = False
             return self.world.get_observation(), 0, True, {}
         rewards, dones = self.world.move_snek([action])
+        if dones[0]:
+            self.alive = False
         return self._get_state(), rewards[0], dones[0], {}
 
     def _reset(self):
         self.current_step = 0
+        self.alive = True
         # Create world
         self.world = World(self.SIZE, n_sneks=1)
         return self._get_state()
@@ -86,3 +94,27 @@ class SingleBabySnek(SingleSnek):
         if rewards[0] > 0:
             return self.world.get_observation(), 1, True, {}
         return self.world.get_observation(), rewards[0], dones[0], {}
+
+'''
+    This variant has an higher STEP_LIMIT but also a progressive step limit
+    (i.e., snek which has not eaten in 100 steps dies anyway)
+'''
+class HungrySingleSnek(SingleSnek):
+
+    def _reset(self):
+        self.hunger = 0
+        self.MAX_HUNGER = 100
+        return SingleSnek._reset(self)
+
+    def _step(self, action):
+        # Check if hunger exceed limit
+        if self.hunger > self.MAX_HUNGER:
+            self.hunger = 0
+            self.alive = False
+            return self.world.get_observation(), 0, True, {}
+        state, reward, done, info = SingleSnek._step(self, action)
+        self.hunger += 1
+        # Check if snek ate something
+        if reward > 0:
+            self.hunger = 0
+        return state, reward, done, info

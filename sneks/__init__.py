@@ -17,3 +17,8 @@ register(
     id='babysnek-v1',
     entry_point='sneks.envs:SingleBabySnek',
 )
+
+register(
+    id='hungrysnek-v1',
+    entry_point='sneks.envs:HungrySingleSnek',
+)

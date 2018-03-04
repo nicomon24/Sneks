@@ -1,1 +1,1 @@
-from sneks.envs.snek import SingleSnek, SingleBabySnek
+from sneks.envs.snek import SingleSnek, SingleBabySnek, HungrySingleSnek
