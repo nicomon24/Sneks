@@ -1,10 +1,7 @@
 '''
     Simple single-player snake environment.
 
-    Actions:
-    - 0: NOOP, continue in the current direction
-    - 1: turn left
-    - 2: turn right
+    Actions: [0,3] representing the directions, see world class.
 '''
 import gym
 from gym import error, spaces, utils
