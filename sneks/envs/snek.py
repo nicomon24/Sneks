@@ -18,6 +18,7 @@ from sneks.core.render import Renderer, RGBifier
         - SIZE: size of the world (default: 16x16)
         - FOOD: number of foods in the world at a given time (default: 1)
         - OBSERVATION_MODE: return a raw observation (block ids) or RGB observation
+            - Layered observation: each channel of the state represent different entities: food, snek, enemies, obstacles
         - OBS_ZOOM: zoom the observation (only for RGB mode, FIXME)
         - STEP_LIMIT: hard step limit of the environment
         - DYNAMIC_STEP_LIMIT: step limit from the last eaten food (HUNGER)
@@ -27,7 +28,7 @@ class SingleSnek(gym.Env):
 
     metadata = {
         'render.modes': ['human','rgb_array'],
-        'observation.types': ['raw', 'rgb']
+        'observation.types': ['raw', 'rgb', 'layered']
     }
 
     def __init__(self, size=(16,16), step_limit=1000, dynamic_step_limit=1000, obs_type='raw', obs_zoom=1, n_food=1, die_on_eat=False, render_zoom=20):
@@ -49,6 +50,9 @@ class SingleSnek(gym.Env):
         elif self.obs_type == 'rgb':
             self.observation_space = spaces.Box(low=0, high=255, shape=(self.SIZE[0], self.SIZE[1], 3))
             self.RGBify = RGBifier(self.SIZE, zoom_factor = obs_zoom, players_colors={})
+        elif self.obs_type == 'layered':
+            # Only 2 layers here, food and snek
+            self.observation_space = spaces.Box(low=0, high=255, shape=(self.SIZE[0], self.SIZE[1], 2))
         else:
             raise(Exception('Unrecognized observation mode.'))
         # Action space
@@ -56,7 +60,7 @@ class SingleSnek(gym.Env):
         # Set renderer
         self.RENDER_ZOOM = render_zoom
 
-    def _step(self, action):
+    def step(self, action):
         # Check if game is ended (raise exception otherwise)
         if not self.alive:
             raise Exception('Need to reset env now.')
@@ -64,7 +68,7 @@ class SingleSnek(gym.Env):
         self.current_step += 1
         if (self.current_step >= self.STEP_LIMIT) or (self.hunger > self.DYNAMIC_STEP_LIMIT):
             self.alive = False
-            return self.world.get_observation(), 0, True, {}
+            return self._get_state(), 0, True, {}
         # Perform the action
         rewards, dones = self.world.move_snek([action])
         # Update and check hunger
@@ -79,7 +83,7 @@ class SingleSnek(gym.Env):
             self.alive = False
         return self._get_state(), rewards[0], dones[0], {}
 
-    def _reset(self):
+    def reset(self):
         # Reset step counters
         self.current_step = 0
         self.alive = True
@@ -88,17 +92,21 @@ class SingleSnek(gym.Env):
         self.world = World(self.SIZE, n_sneks=1)
         return self._get_state()
 
-    def _seed(self, seed):
+    def seed(self, seed):
         random.seed(seed)
 
     def _get_state(self):
         _state = self.world.get_observation()
         if self.obs_type == 'rgb':
             return self.RGBify.get_image(_state)
+        elif self.obs_type == 'layered':
+            s = np.array([(_state == self.world.FOOD).astype(int), ((_state == self.world.sneks[0].snek_id) or (_state == self.world.sneks[0].snek_id+1)).astype(int)])
+            s = np.transpose(s, [1, 2, 0])
+            return s
         else:
             return _state
 
-    def _render(self, mode='human', close=False):
+    def render(self, mode='human', close=False):
         if not close:
             # Renderer lazy loading
             if not hasattr(self, 'renderer'):

@@ -17,6 +17,14 @@ register(
 )
 
 register(
+    id='snek-layered-v1',
+    entry_point='sneks.envs:SingleSnek',
+    kwargs = {
+        'obs_type' : 'layered'
+    }
+)
+
+register(
     id='snek-rgb-zoom5-v1',
     entry_point='sneks.envs:SingleSnek',
     kwargs = {

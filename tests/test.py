@@ -19,6 +19,7 @@ env = gym.make(FLAGS.env)
 
 for e in range(3):
     obs = env.reset()
+    print(obs.shape)
     done = False
     r = 0
     while not done:
