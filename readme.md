@@ -45,7 +45,7 @@ Rewards:
 - Dies: -1
 <br>
 
-Above a GIF of the environment played by vanilla DQN. All the solutions and implementations on the environment can be found in the corresponding [github repo](https://github.com/nicomon24/Sneks-solutions), that contains more detailed explanation on solutions
+Above a GIF of the environment played by vanilla DQN.
 
 [snek]: src/snek.gif?raw=true
 
