@@ -30,3 +30,4 @@ for e in range(3):
         sleep(0.01)
 
 print("Observation:", obs.shape)
+env.close()

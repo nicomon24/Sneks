@@ -11,34 +11,46 @@ The environment can be installed using pip
 ## Requirements
 - numpy
 - gym
+- opencv2
 
 ## Supported platforms
 We only support Python3. Environments are actively tested on Ubuntu and MACOS. Currently there are some issues with Ubuntu renderer.
 
 ## Observations and actions
-The environment outputs as an observation a matrix representing the game map (as an image with pixels). The observation size depends on the map size. Every different object is associated with different numbers in the grid (0-255).<br>
-We provide two different observation mode:
-- *raw*: returns the game matrix directly.
-- *rgb*: returns a render of the game matrix as an rgb image, with a possible zoom factor.
+At its core, the game state is represented by a matrix of a given size (depends on the various environments). Every different object is associated with different sets of IDs, allowing expansions for new objects and multi-players.
 
-Actions are integers in [0,3] representing [UP, RIGHT, DOWN, LEFT]<br>
+The observation returned by the environment can be of different types:
+- **raw**: returns directly the game matrix, IDs are integer encoded in the range 0-255.
+- **rgb**: returns a color-coded image (0-255), using the color scheme defined in the render object.
+- **rgb5**: returns a color-coded image (0-255) but enlarged in size by a factor of 5. Other scales can be added in the registration file (init file).
+- **layered**: each object is returned in a different channel of an image. This could be better in multi-agent settings (EXPERIMENTAL).
+
+The size of the environment can be set directly choosing between [16, 32, 64], the grid will always be a square.
+
+Actions are discrete, encoded by integers in the range [0,3] representing [UP, RIGHT, DOWN, LEFT]<br>
 In multi-agent environments actions are provided as vectors. The step function returns a vector of rewards and done-flags (observation is the same for every player).
 
 ## Environments and versions
+Given the many possible configurations for observations and sizes, we adopt a modular naming strategy similar to the OpenAI gym Atari environments. Each environment is of the form:
+> <env_type>-<observation_type>-<size\>-v1
 
-### babysnek-v1
+The various environment types are described below.
+
+### babysnek
 ![babysnek][babysnek] <br>
-First simple enviroment (16x16 grid), only one snake and one goal (food). The episode terminates once the snake eats the food or dies (eats himself or go outside map limits). Just a basic setting to test things out.<br>
+First simple environment, only one snake and one goal (food). The episode terminates once the snake eats the food or dies (eats himself or go outside map limits). Just a basic setting to test things out.<br>
 Rewards:
 - Reach goal (eats): +1
 - Move: 0
 - Dies: -1
 
+Example environment: *babysnek-raw-16-v1*
+
 [babysnek]: src/babysnek.gif?raw=true
 
 ### snek-v1
 ![snek][snek] <br>
-Enviroment in a 16x16 grid, only one snake and one goal (food). The episode terminates when it reaches the step limit (default: 1000) or if the snake goes outside bounds or eats itself.<br>
+Environment in a 16x16 grid, only one snake and one goal (food). The episode terminates when it reaches the step limit (default: 1000) or if the snake goes outside bounds or eats itself.<br>
 Rewards:
 - Reach goal (eats): +1
 - Move: 0
@@ -47,21 +59,20 @@ Rewards:
 
 Above a GIF of the environment played by vanilla DQN.
 
+Example environment: *snek-rgb-16-v1*
+
 [snek]: src/snek.gif?raw=true
-
-### snek-rgb-v1
-
-The same as *snek-v1* but with observations in RGB mode.
 
 ### hungrysnek-v1
 
 Similar to *snek-v1*, but the snek also has a dynamic step limit which resets after eating, as a progressively increasing hunger.
 
+Example environment: *hungysnek-raw-32-v1*
+
 ## TODO
-- Larger single-agent environment (32x32 and 64x64)
 - Define various multiagent environments:
-  - Snakes can eat each other
-  - Eat or starve, snakes cannot eat each other but food is limited
+  - Snakes can eat each other (who wins?).
+  - Eat or starve, snakes cannot eat each other but food is limited.
 
 ## Ideas
 - Cooperation game: snakes can eat only if they reach the same food together
