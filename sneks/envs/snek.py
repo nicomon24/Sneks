@@ -112,3 +112,8 @@ class SingleSnek(gym.Env):
             if not hasattr(self, 'renderer'):
                 self.renderer = Renderer(self.SIZE, zoom_factor = self.RENDER_ZOOM, players_colors={})
             return self.renderer._render(self.world.get_observation(), mode=mode, close=False)
+
+    def close(self):
+        if self.renderer:
+            self.renderer.close()
+            self.renderer = None
