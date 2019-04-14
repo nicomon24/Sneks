@@ -59,6 +59,7 @@ class SingleSnek(gym.Env):
         self.action_space = spaces.Discrete(len(self.world.DIRECTIONS))
         # Set renderer
         self.RENDER_ZOOM = render_zoom
+        self.renderer = None
 
     def step(self, action):
         # Check if game is ended (raise exception otherwise)
@@ -109,7 +110,7 @@ class SingleSnek(gym.Env):
     def render(self, mode='human', close=False):
         if not close:
             # Renderer lazy loading
-            if not hasattr(self, 'renderer'):
+            if self.renderer is None:
                 self.renderer = Renderer(self.SIZE, zoom_factor = self.RENDER_ZOOM, players_colors={})
             return self.renderer._render(self.world.get_observation(), mode=mode, close=False)
 
