@@ -8,13 +8,17 @@ from time import sleep
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--env', type=str, default='snek-rgb-16-v1',
-  help="""\
-  Select environment ID.
-""")
+parser.add_argument('--env', type=str, default=None, help="""Select environment ID.""")
 FLAGS, unparsed = parser.parse_known_args()
 
-env = gym.make(FLAGS.env)
+if FLAGS.env is not None:
+    # Creating the environment from its ID
+    env = gym.make(FLAGS.env)
+else:
+    # Creating the environment without gym registering
+    from sneks.envs.snek import SingleSnek
+    env = SingleSnek(obs_type='rgb', n_food=3)
+
 #env = gym.wrappers.Monitor(env, 'tmp_video')
 
 for e in range(3):

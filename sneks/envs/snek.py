@@ -42,7 +42,8 @@ class SingleSnek(gym.Env):
         # Set babysnek (dies when eating the first piece)
         self.DIE_ON_EAT = die_on_eat
         # Create world
-        self.world = World(self.SIZE, n_sneks=1, n_food=n_food)
+        self.n_food = n_food
+        self.world = World(self.SIZE, n_sneks=1, n_food=self.n_food)
         # Set observation type and space
         self.obs_type = obs_type
         if self.obs_type == 'raw':
@@ -90,7 +91,7 @@ class SingleSnek(gym.Env):
         self.alive = True
         self.hunger = 0
         # Create world
-        self.world = World(self.SIZE, n_sneks=1)
+        self.world = World(self.SIZE, n_sneks=1, n_food=self.n_food)
         return self._get_state()
 
     def seed(self, seed):

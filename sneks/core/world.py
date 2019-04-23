@@ -59,15 +59,12 @@ class World:
         self.size = size
         self.world = np.zeros(size)
         self.base_available_position = set([(i,j) for i in range(self.size[0]) for j in range(self.size[1])]) #stored in a variable to not be computed each step.
-        self.available_positions = self.base_available_position #Reset available positions
         # Init sneks
         self.sneks = []
         for _ in range(n_sneks):
             snek = self.register_snek()
-            self.available_positions = self.available_positions - set(snek.my_blocks)
         # Set N foods
-        for _ in range(n_food):
-            self.place_one_food()
+        self.place_food(n_food = n_food)
 
     def register_snek(self):
         # Choose position (between [4 and SIZE-4])
@@ -80,11 +77,18 @@ class World:
         self.sneks.append(new_snek)
         return new_snek
 
-    def place_one_food(self):
-        # Choose a place
-        choosen_position = random.choice(list(self.available_positions))
-        #print(choosen_position)
-        self.world[choosen_position[0], choosen_position[1]] = self.FOOD
+    def place_food(self, n_food=1):
+        # Update the available_positions from sneks
+        available_positions = self.base_available_position
+        for snek in self.sneks:
+            available_positions = available_positions - set(snek.my_blocks)
+        # Place food objects
+        for _ in range(n_food):
+            # Choose a place
+            choosen_position = random.choice(list(available_positions))
+            self.world[choosen_position[0], choosen_position[1]] = self.FOOD
+            # Remove the current choice for next steps
+            available_positions.remove(choosen_position)
 
     def get_observation(self):
         obs = self.world.copy()
@@ -102,7 +106,6 @@ class World:
         rewards = []
         dones = []
         new_food_needed = 0 #Will be used for the food update
-        self.available_positions = self.base_available_position #Reset available positions
         for snek, action in zip(self.sneks, actions):
             new_snek_head, old_snek_tail = snek.step(action)
             # Check if snek is outside bounds
@@ -122,17 +125,14 @@ class World:
                 self.world[new_snek_head[0], new_snek_head[1]] = 0
                 # Add tail again
                 snek.my_blocks.append(old_snek_tail)
-                # Request to place new food. New food creation cannot be called here because :
-				# - there has been no update of the snakes blocks (which leads to a bug of a food being place under a snake).
-				# - Another snake may receive an unnecessary reward because this food might be place "right in front of him" before he moves.
+                # Request to place new food. New food creation cannot be called here directly, need to update all sneks before
                 new_food_needed = new_food_needed + 1
                 rewards.append(self.EAT_REWARD)
                 dones.append(False)
             else:
                 rewards.append(self.MOVE_REWARD)
                 dones.append(False)
-            self.available_positions = self.available_positions - set(snek.my_blocks) #update of available positions
 		#Adding new food.
-        for _ in range(new_food_needed):
-            self.place_one_food()
+        if new_food_needed > 0:
+            self.place_food(n_food = new_food_needed)
         return rewards, dones
