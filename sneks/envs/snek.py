@@ -47,13 +47,13 @@ class SingleSnek(gym.Env):
         # Set observation type and space
         self.obs_type = obs_type
         if self.obs_type == 'raw':
-            self.observation_space = spaces.Box(low=0, high=255, shape=(self.SIZE[0]*obs_zoom, self.SIZE[1]*obs_zoom))
+            self.observation_space = spaces.Box(low=0, high=255, shape=(self.SIZE[0]*obs_zoom, self.SIZE[1]*obs_zoom), dtype=np.uint8)
         elif self.obs_type == 'rgb':
-            self.observation_space = spaces.Box(low=0, high=255, shape=(self.SIZE[0]*obs_zoom, self.SIZE[1]*obs_zoom, 3))
+            self.observation_space = spaces.Box(low=0, high=255, shape=(self.SIZE[0]*obs_zoom, self.SIZE[1]*obs_zoom, 3), dtype=np.uint8)
             self.RGBify = RGBifier(self.SIZE, zoom_factor = obs_zoom, players_colors={})
         elif self.obs_type == 'layered':
             # Only 2 layers here, food and snek
-            self.observation_space = spaces.Box(low=0, high=255, shape=(self.SIZE[0]*obs_zoom, self.SIZE[1]*obs_zoom, 2))
+            self.observation_space = spaces.Box(low=0, high=255, shape=(self.SIZE[0]*obs_zoom, self.SIZE[1]*obs_zoom, 2), dtype=np.uint8)
         else:
             raise(Exception('Unrecognized observation mode.'))
         # Action space
