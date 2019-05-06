@@ -31,7 +31,7 @@ class SingleSnek(gym.Env):
         'observation.types': ['raw', 'rgb', 'layered']
     }
 
-    def __init__(self, size=(16,16), step_limit=1000, dynamic_step_limit=1000, obs_type='raw', obs_zoom=1, n_food=1, die_on_eat=False, render_zoom=20):
+    def __init__(self, size=(16,16), step_limit=1000, dynamic_step_limit=1000, obs_type='raw', obs_zoom=1, n_food=1, die_on_eat=False, render_zoom=20, add_walls=False):
         # Set size of the game world
         self.SIZE = size
         # Set step limit
@@ -41,9 +41,11 @@ class SingleSnek(gym.Env):
         self.hunger = 0
         # Set babysnek (dies when eating the first piece)
         self.DIE_ON_EAT = die_on_eat
+        # Walls flag
+        self.add_walls = add_walls
         # Create world
         self.n_food = n_food
-        self.world = World(self.SIZE, n_sneks=1, n_food=self.n_food)
+        self.world = World(self.SIZE, n_sneks=1, n_food=self.n_food, add_walls=self.add_walls)
         # Set observation type and space
         self.obs_type = obs_type
         if self.obs_type == 'raw':
@@ -91,7 +93,7 @@ class SingleSnek(gym.Env):
         self.alive = True
         self.hunger = 0
         # Create world
-        self.world = World(self.SIZE, n_sneks=1, n_food=self.n_food)
+        self.world = World(self.SIZE, n_sneks=1, n_food=self.n_food, add_walls=self.add_walls)
         return self._get_state()
 
     def seed(self, seed):

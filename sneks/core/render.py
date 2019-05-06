@@ -33,8 +33,11 @@ class RGBifier:
         # Void => BLACK
         if state == 0:
             return (0,0,0)
-        # Food => RED
+        # Wall => WHITE
         elif state == 255:
+            return (255, 255, 255)
+        # Food => RED
+        elif state == 64:
             return (255, 0, 0)
         else:
             # Get player ID

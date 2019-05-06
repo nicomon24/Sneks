@@ -49,16 +49,25 @@ class Snek:
 
 class World:
 
-    def __init__(self, size, n_sneks=1, n_food=1):
+    def __init__(self, size, n_sneks=1, n_food=1, add_walls=False):
         self.DEAD_REWARD = -1
         self.MOVE_REWARD = 0
         self.EAT_REWARD = 1
-        self.FOOD = 255
+        self.FOOD = 64
+        self.WALL = 255
         self.DIRECTIONS = Snek.DIRECTIONS
+        self.add_walls = add_walls
         # Init a numpy matrix with zeros of predefined size
         self.size = size
         self.world = np.zeros(size)
-        self.base_available_position = set([(i,j) for i in range(self.size[0]) for j in range(self.size[1])]) #stored in a variable to not be computed each step.
+        # Add walls if requested
+        if add_walls:
+            self.world[0, :] = self.WALL
+            self.world[-1, :] = self.WALL
+            self.world[:, 0] = self.WALL
+            self.world[:, -1] = self.WALL
+        # Compute all available_positions for food
+        self.base_available_position = set(zip(*np.where(self.world == 0)))
         # Init sneks
         self.sneks = []
         for _ in range(n_sneks):
@@ -109,7 +118,7 @@ class World:
         for snek, action in zip(self.sneks, actions):
             new_snek_head, old_snek_tail = snek.step(action)
             # Check if snek is outside bounds
-            if not (0 <= new_snek_head[0] < self.size[0]) or not(0 <= new_snek_head[1] < self.size[1]):
+            if not (0 <= new_snek_head[0] < self.size[0]) or not(0 <= new_snek_head[1] < self.size[1]) or self.world[new_snek_head[0], new_snek_head[1]] == self.WALL:
                 snek.my_blocks = snek.my_blocks[1:]
                 rewards.append(self.DEAD_REWARD)
                 dones.append(True)

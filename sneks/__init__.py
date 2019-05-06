@@ -1,52 +1,54 @@
 from gym.envs.registration import register
+import itertools
 
-SIZES = [16, 32, 64]
-OBSERVATION_TYPES = ['raw', 'rgb', 'rgb5', 'layered']
-COMBINATIONS = [(size, obs_type) for size in SIZES for obs_type in OBSERVATION_TYPES]
+VERSION = '-v1'
 
-def get_obs_and_zoom(obs_type):
-    if obs_type == 'rgb5':
-        return 'rgb', 5
-    else:
-        return obs_type, 1
+# ========= SETTINGS =========
+# Settings include all possible combinations of environments.
+# Expressed as a dictionary of lists, in each list there is a tuple
+# (label, values) where values are aggregated together to get the final
+# args passed to the environment.
+# ============================
+SETTINGS = {
+    'ENV_TYPE': [
+        ('snek', {}),
+        ('hungrysnek', {'dynamic_step_limit': 100}),
+        ('babysnek', {'die_on_eat' : True})
+    ],
+    'SIZES': [
+        ('-16', {'size': (16, 16)}),
+        ('-32', {'size': (32, 32)}),
+        ('-64', {'size': (64, 64)}),
+    ],
+    'OBSERVATION_TYPES': [
+        ('-raw', {'obs_type': 'raw', 'obs_zoom': 1}),
+        ('-rgb', {'obs_type': 'rgb', 'obs_zoom': 1}),
+        ('-rgb5', {'obs_type': 'rgb', 'obs_zoom': 5}),
+    ],
+    'WALLS': [
+        ('', {'add_walls': True}),
+        ('-NoWalls', {'add_walls': False})
+    ]
+}
+# Settings key, also fix the order of options
+SETTINGS_KEY = ['ENV_TYPE', 'OBSERVATION_TYPES', 'SIZES', 'WALLS']
 
-# Type: snek
-for (size, obs_type) in COMBINATIONS:
-    obs, zoom = get_obs_and_zoom(obs_type)
+for setting_index in itertools.product(*[range(len(SETTINGS[key])) for key in SETTINGS_KEY]):
+    # Get the setting
+    env_id = ''
+    setting = {}
+    for i, key in enumerate(SETTINGS_KEY):
+        # Get the label and settings dict
+        label, value = SETTINGS[key][setting_index[i]]
+        # Add to label
+        env_id += label
+        # Add to settings dict
+        setting = {**setting, **value}
+    # Add version to id
+    env_id += VERSION
+    # Register the environment
     register(
-        id='snek-' + obs_type + '-' + str(size) + '-v1',
+        id=env_id,
         entry_point='sneks.envs:SingleSnek',
-        kwargs = {
-            'obs_type' : obs,
-            'obs_zoom': zoom,
-            'size': (size, size)
-        }
-    )
-
-# Type: babysnek
-for (size, obs_type) in COMBINATIONS:
-    obs, zoom = get_obs_and_zoom(obs_type)
-    register(
-        id='babysnek-' + obs_type + '-' + str(size) + '-v1',
-        entry_point='sneks.envs:SingleSnek',
-        kwargs = {
-            'die_on_eat' : True,
-            'obs_type' : obs,
-            'obs_zoom': zoom,
-            'size': (size, size)
-        }
-    )
-
-# Type: hungysnek
-for (size, obs_type) in COMBINATIONS:
-    obs, zoom = get_obs_and_zoom(obs_type)
-    register(
-        id='hungrysnek-' + obs_type + '-' + str(size) + '-v1',
-        entry_point='sneks.envs:SingleSnek',
-        kwargs = {
-            'dynamic_step_limit': 100,
-            'obs_type' : obs,
-            'obs_zoom': zoom,
-            'size': (size, size)
-        }
+        kwargs = setting
     )
