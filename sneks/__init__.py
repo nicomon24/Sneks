@@ -11,9 +11,12 @@ VERSION = '-v1'
 # ============================
 SETTINGS = {
     'ENV_TYPE': [
-        ('snek', {}),
-        ('hungrysnek', {'dynamic_step_limit': 100}),
-        ('babysnek', {'die_on_eat' : True})
+        ('snek', {'entry_point': 'sneks.envs:SingleSnek'}),
+        ('hungrysnek', {'dynamic_step_limit': 100, 'entry_point': 'sneks.envs:SingleSnek'}),
+        ('babysnek', {'die_on_eat' : True, 'entry_point': 'sneks.envs:SingleSnek'}),
+        ('sneks2', {'entry_point': 'sneks.envs:MultiSneks', 'n_sneks': 2}),
+        ('sneks3', {'entry_point': 'sneks.envs:MultiSneks', 'n_sneks': 3}),
+        ('sneks10', {'entry_point': 'sneks.envs:MultiSneks', 'n_sneks': 10}),
     ],
     'SIZES': [
         ('-16', {'size': (16, 16)}),
@@ -46,9 +49,12 @@ for setting_index in itertools.product(*[range(len(SETTINGS[key])) for key in SE
         setting = {**setting, **value}
     # Add version to id
     env_id += VERSION
+    # Save entrypoint and remove from settings
+    entry_point = setting['entry_point']
+    setting.pop('entry_point', None)
     # Register the environment
     register(
         id=env_id,
-        entry_point='sneks.envs:SingleSnek',
+        entry_point=entry_point,
         kwargs = setting
     )

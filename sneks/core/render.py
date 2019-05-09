@@ -22,7 +22,8 @@ class RGBifier:
     def __init__(self, size, zoom_factor=1, players_colors = {}):
         # Setting default colors
         self.pcolors = {
-            0: SnekColor((0, 204, 0), (0, 77, 0))
+            0: SnekColor((0, 204, 0), (0, 77, 0)),
+            1: SnekColor((0, 0, 204), (0, 0, 77)),
         }
         self.zoom_factor = zoom_factor
         self.size = size

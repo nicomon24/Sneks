@@ -25,6 +25,7 @@ class Snek:
     def __init__(self, snek_id, start_position, start_direction_index, start_length):
         self.snek_id = snek_id
         self.current_direction_index = start_direction_index
+        self.alive = True
         # Place the snek
         start_position = start_position
         self.my_blocks = [start_position]
@@ -86,10 +87,13 @@ class World:
         self.sneks.append(new_snek)
         return new_snek
 
+    def get_alive_sneks(self):
+        return [snek for snek in self.sneks if snek.alive]
+
     def place_food(self, n_food=1):
         # Update the available_positions from sneks
         available_positions = self.base_available_position
-        for snek in self.sneks:
+        for snek in self.get_alive_sneks():
             available_positions = available_positions - set(snek.my_blocks)
         # Place food objects
         for _ in range(n_food):
@@ -102,7 +106,7 @@ class World:
     def get_observation(self):
         obs = self.world.copy()
         # Draw snek over the world
-        for snek in self.sneks:
+        for snek in self.get_alive_sneks():
             for block in snek.my_blocks:
                 obs[block[0], block[1]] = snek.snek_id
             # Highlight head
@@ -112,35 +116,45 @@ class World:
     # Move the selected snek
     # Returns reward and done flag
     def move_snek(self, actions):
-        rewards = []
+        rewards = [0] * len(self.sneks)
         dones = []
         new_food_needed = 0 #Will be used for the food update
-        for snek, action in zip(self.sneks, actions):
+        for i, (snek, action) in enumerate(zip(self.sneks, actions)):
+            if not snek.alive:
+                continue
             new_snek_head, old_snek_tail = snek.step(action)
             # Check if snek is outside bounds
             if not (0 <= new_snek_head[0] < self.size[0]) or not(0 <= new_snek_head[1] < self.size[1]) or self.world[new_snek_head[0], new_snek_head[1]] == self.WALL:
                 snek.my_blocks = snek.my_blocks[1:]
-                rewards.append(self.DEAD_REWARD)
-                dones.append(True)
-                # TODO: remove snek from players
+                snek.alive = False
             # Check if snek eats himself
             elif new_snek_head in snek.my_blocks[1:]:
-                rewards.append(self.DEAD_REWARD)
-                dones.append(True)
-                # TODO: remove snek from players
+                snek.alive = False
+            # Check if snek is eating another snek
+            for j, other_snek in enumerate(self.sneks):
+                if i != j and other_snek.alive:
+                    # Check if heads collided
+                    if new_snek_head == other_snek.my_blocks[0]:
+                        snek.alive = False
+                        other_snek.alive = False
+                    # Check head collided with another snek body
+                    elif new_snek_head in other_snek.my_blocks[1:]:
+                        snek.alive = False
             # Check if snek eats something
-            elif self.world[new_snek_head[0], new_snek_head[1]] == self.FOOD:
+            if snek.alive and self.world[new_snek_head[0], new_snek_head[1]] == self.FOOD:
                 # Remove old food
                 self.world[new_snek_head[0], new_snek_head[1]] = 0
                 # Add tail again
                 snek.my_blocks.append(old_snek_tail)
                 # Request to place new food. New food creation cannot be called here directly, need to update all sneks before
                 new_food_needed = new_food_needed + 1
-                rewards.append(self.EAT_REWARD)
-                dones.append(False)
-            else:
-                rewards.append(self.MOVE_REWARD)
-                dones.append(False)
+                rewards[i] = self.EAT_REWARD
+            elif snek.alive:
+                # Didn't eat anything, move reward
+                rewards[i] = self.MOVE_REWARD
+        # Compute done flags and assign dead rewards
+        dones = [not snek.alive for snek in self.sneks]
+        rewards = [r if snek.alive else self.DEAD_REWARD for r, snek in zip(rewards, self.sneks)]
 		#Adding new food.
         if new_food_needed > 0:
             self.place_food(n_food = new_food_needed)
