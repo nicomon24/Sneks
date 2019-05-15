@@ -51,9 +51,9 @@ class Snek:
 class World:
 
     def __init__(self, size, n_sneks=1, n_food=1, add_walls=False):
-        self.DEAD_REWARD = -1
-        self.MOVE_REWARD = 0
-        self.EAT_REWARD = 1
+        self.DEAD_REWARD = -1.0
+        self.MOVE_REWARD = 0.0
+        self.EAT_REWARD = 1.0
         self.FOOD = 64
         self.WALL = 255
         self.DIRECTIONS = Snek.DIRECTIONS
